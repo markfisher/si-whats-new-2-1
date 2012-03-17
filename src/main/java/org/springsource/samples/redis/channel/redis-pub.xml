@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:redis="http://www.springframework.org/schema/integration/redis"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/integration
+                        http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+                        http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/integration/redis
+                        http://www.springframework.org/schema/integration/redis/spring-integration-redis-2.1.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<int:inbound-channel-adapter expression="new java.util.Date().toString()" channel="redisChannel">
+		<int:poller fixed-rate="5000"/>
+	</int:inbound-channel-adapter>
+
+	<redis:publish-subscribe-channel id="redisChannel" topic-name="devnexus"/>
+
+	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"/>
+
+</beans>
