@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+    xsi:schemaLocation="http://www.springframework.org/schema/integration
+                        http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+                        http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/data/mongo
+                        http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+
+	<int:splitter input-channel="orders" output-channel="items" apply-sequence="true"/>
+
+	<int:aggregator input-channel="items" message-store="messageStore" output-channel="deliveries"
+		correlation-strategy-expression="headers.group" release-strategy-expression="size() == 10"/>
+
+	<int:logging-channel-adapter id="deliveries" expression="'received: ' + payload"/>
+
+	<bean id="messageStore" class="org.springframework.integration.mongodb.store.MongoDbMessageStore">
+		<constructor-arg><mongo:db-factory/></constructor-arg>
+	</bean>
+
+
+
+
+
+
+
+
+
+
+	<!-- enable the wire-tap for logging -->
+
+	<int:channel id="items">
+		<int:interceptors>
+			<int:wire-tap channel="log"/>
+		</int:interceptors>
+	</int:channel>
+
+	<int:logging-channel-adapter id="log" log-full-message="true"/>
+	
+</beans>
+
